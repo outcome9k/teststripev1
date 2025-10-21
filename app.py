@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify
 import cloudscraper
 from fake_useragent import UserAgent
@@ -7,9 +8,7 @@ from urllib.parse import quote_plus
 import json
 import time
 import random
-import webbrowser
 import re
-import threading
 
 app = Flask(__name__)
 
@@ -25,11 +24,9 @@ def format_proxy(proxy_string):
     if not proxy_string:
         return None
     
-    # If proxy already has protocol, return as is
     if proxy_string.startswith(('http://', 'https://')):
         return proxy_string
     
-    # Parse proxy with authentication: host:port:username:password
     parts = proxy_string.split(':')
     
     if len(parts) == 4:
@@ -51,7 +48,6 @@ def process_payment(card_data, proxy=None):
             }
         )
 
-        # Format proxy properly
         formatted_proxy = format_proxy(proxy)
         
         if formatted_proxy:
@@ -60,7 +56,6 @@ def process_payment(card_data, proxy=None):
                 "https": formatted_proxy,
             }
             scraper.proxies = proxies
-            print(f"Using proxy: {formatted_proxy}")
 
         fake = Faker('en_GB')
         first_name = fake.first_name()
@@ -97,7 +92,6 @@ def process_payment(card_data, proxy=None):
         phone = fake.phone_number()
         name = f"{first_name}+{last_name}"
         email_encoded = quote_plus(email)
-        session_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         ua = UserAgent()
         user_agent = ua.random
 
@@ -452,7 +446,6 @@ def process_get():
 def health_check():
     return jsonify({"status": "healthy", "timestamp": datetime.now().isoformat()})
 
-# app.py
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port, debug=False)debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)
